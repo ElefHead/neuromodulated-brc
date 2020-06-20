@@ -38,6 +38,11 @@ Alternatively, a Neuromodulated Bistable _RNN_ layer can be imported and used as
 An [example](https://github.com/ElefHead/neuromodulated-brc/blob/main/notebooks/sequential%20MNIST.ipynb) of training and 
 evaluation using MNIST data is in the `notebooks` folder.
 
+**Dependencies**
+* [Tensorflow 2](https://www.tensorflow.org/api_docs/python/tf) for layers. 
+* [Tensorflow Datasets](https://www.tensorflow.org/datasets/api_docs/python/tfds) for MNIST. 
+* [Jupyter](https://jupyter.org/install.html) for notebook. 
+
 ## Notes
 * The Bistable Recurrent Cell modifies the GRU. My code also inherits keras GRUCell and GRU and overloads 
 the functions to reflect the equation changes.
