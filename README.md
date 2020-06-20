@@ -10,7 +10,7 @@ by [Nicolas Vecoven](https://twitter.com/vecovennicolas),
 ## Usage
 To use the library, clone the repo and place `bistablernn` folder inside your project directory.  
 
----
+
 The Neuromodulated Bistable Recurrent Cell can be imported as: 
   ```python
   from bistablernn import NBRCell
@@ -19,7 +19,7 @@ The Neuromodulated Bistable Recurrent Cell can be imported as:
   ```python
   tf.keras.layers.RNN(NBRCell(num_units))
   ```
----
+
 Alternatively, a Neuromodulated Bistable _RNN_ layer can be imported and used as: 
   ```python
   from bistablernn import NBR
