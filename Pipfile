@@ -6,7 +6,6 @@ verify_ssl = true
 [dev-packages]
 jupyter = "*"
 notebook = "*"
-lab = "*"
 tensorflow-datasets = "*"
 
 [packages]
