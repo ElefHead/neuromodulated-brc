@@ -40,7 +40,7 @@ class NBRCell(keras.layers.GRUCell):
             dropout=dropout,
             recurrent_dropout=recurrent_dropout,
             implementation=implementation,
-            reset_after=False,
+            reset_after=True,
             **kwargs
         )
 

@@ -1,9 +1,11 @@
 import tensorflow as tf 
 from tensorflow import keras
+import warnings
+
 from .nbrcell import NBRCell
 
 
-class NBR(keras.layers.RNN):
+class NBR(keras.layers.GRU):
     """
     Arguments:
     units: Positive integer, dimensionality of the output space.
@@ -70,9 +72,6 @@ class NBR(keras.layers.RNN):
         RNN calculation. However, most TensorFlow data is batch-major, so by
         default this function accepts input and emits output in batch-major
         form.
-    reset_after: GRU convention (whether to apply reset gate after or
-        before matrix multiplication). False = "before" (default),
-        True = "after" (CuDNN compatible).
     Call arguments:
     inputs: A 3D tensor.
     mask: Binary tensor of shape `(samples, timesteps)` indicating whether
@@ -86,39 +85,33 @@ class NBR(keras.layers.RNN):
     """
 
     def __init__(self,
-                units,
-                activation='tanh',
-                recurrent_activation='hard_sigmoid',
-                use_bias=True,
-                kernel_initializer='glorot_uniform',
-                recurrent_initializer='orthogonal',
-                bias_initializer='zeros',
-                kernel_regularizer=None,
-                recurrent_regularizer=None,
-                bias_regularizer=None,
-                activity_regularizer=None,
-                kernel_constraint=None,
-                recurrent_constraint=None,
-                bias_constraint=None,
-                dropout=0.,
-                implementation=2,
-                recurrent_dropout=0.,
-                return_sequences=False,
-                return_state=False,
-                go_backwards=False,
-                stateful=False,
-                unroll=False,
-                **kwargs):
-        if implementation == 0:
-            warnings.warn('`implementation=0` has been deprecated, '
-                            'and now defaults to `implementation=1`.'
-                            'Please update your layer call.')
-        if 'enable_caching_device' in kwargs:
-            cell_kwargs = {'enable_caching_device':
-                            kwargs.pop('enable_caching_device')}
-        else:
-            cell_kwargs = {}
-        cell = NBRCell(
+               units,
+               activation='tanh',
+               recurrent_activation='sigmoid',
+               use_bias=True,
+               kernel_initializer='glorot_uniform',
+               recurrent_initializer='orthogonal',
+               bias_initializer='zeros',
+               kernel_regularizer=None,
+               recurrent_regularizer=None,
+               bias_regularizer=None,
+               activity_regularizer=None,
+               kernel_constraint=None,
+               recurrent_constraint=None,
+               bias_constraint=None,
+               dropout=0.,
+               recurrent_dropout=0.,
+               implementation=2,
+               return_sequences=False,
+               return_state=False,
+               go_backwards=False,
+               stateful=False,
+               unroll=False,
+               time_major=False,
+               **kwargs):
+    # return_runtime is a flag for testing, which shows the real backend
+    # implementation chosen by grappler in graph mode.
+        super(NBR, self).__init__(
             units,
             activation=activation,
             recurrent_activation=recurrent_activation,
@@ -129,138 +122,38 @@ class NBR(keras.layers.RNN):
             kernel_regularizer=kernel_regularizer,
             recurrent_regularizer=recurrent_regularizer,
             bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
             kernel_constraint=kernel_constraint,
             recurrent_constraint=recurrent_constraint,
             bias_constraint=bias_constraint,
             dropout=dropout,
             recurrent_dropout=recurrent_dropout,
             implementation=implementation,
-            dtype=kwargs.get('dtype'),
-            trainable=kwargs.get('trainable', True),
-            **cell_kwargs)
-        super(NBR, self).__init__(
-            cell,
             return_sequences=return_sequences,
             return_state=return_state,
             go_backwards=go_backwards,
             stateful=stateful,
             unroll=unroll,
+            time_major=time_major,
+            reset_after=True,
             **kwargs)
-        self.activity_regularizer = keras.regularizers.get(activity_regularizer)
-        self.input_spec = [keras.layers.InputSpec(ndim=3)]
 
-    def call(self, inputs, mask=None, training=None, initial_state=None):
-        self._maybe_reset_cell_dropout_mask(self.cell)
-        return super(NBR, self).call(
-            inputs, mask=mask, training=training, initial_state=initial_state)
-
-    @property
-    def units(self):
-        return self.cell.units
-
-    @property
-    def activation(self):
-        return self.cell.activation
-
-    @property
-    def recurrent_activation(self):
-        return self.cell.recurrent_activation
-
-    @property
-    def use_bias(self):
-        return self.cell.use_bias
-
-    @property
-    def kernel_initializer(self):
-        return self.cell.kernel_initializer
-
-    @property
-    def recurrent_initializer(self):
-        return self.cell.recurrent_initializer
-
-    @property
-    def bias_initializer(self):
-        return self.cell.bias_initializer
-
-    @property
-    def kernel_regularizer(self):
-        return self.cell.kernel_regularizer
-
-    @property
-    def recurrent_regularizer(self):
-        return self.cell.recurrent_regularizer
-
-    @property
-    def bias_regularizer(self):
-        return self.cell.bias_regularizer
-
-    @property
-    def kernel_constraint(self):
-        return self.cell.kernel_constraint
-
-    @property
-    def recurrent_constraint(self):
-        return self.cell.recurrent_constraint
-
-    @property
-    def bias_constraint(self):
-        return self.cell.bias_constraint
-
-    @property
-    def dropout(self):
-        return self.cell.dropout
-
-    @property
-    def implementation(self):
-        return self.cell.implementation
-
-    @property
-    def recurrent_dropout(self):
-        return self.cell.recurrent_dropout
-
-    def get_config(self):
-        config = {
-            'units':
-                self.units,
-            'activation':
-                keras.activations.serialize(self.activation),
-            'recurrent_activation':
-                keras.activations.serialize(self.recurrent_activation),
-            'use_bias':
-                self.use_bias,
-            'kernel_initializer':
-                keras.initializers.serialize(self.kernel_initializer),
-            'recurrent_initializer':
-                keras.initializers.serialize(self.recurrent_initializer),
-            'bias_initializer':
-                keras.initializers.serialize(self.bias_initializer),
-            'kernel_regularizer':
-                keras.regularizers.serialize(self.kernel_regularizer),
-            'recurrent_regularizer':
-                keras.regularizers.serialize(self.recurrent_regularizer),
-            'bias_regularizer':
-                keras.regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer':
-                keras.regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint':
-                keras.constraints.serialize(self.kernel_constraint),
-            'recurrent_constraint':
-                keras.constraints.serialize(self.recurrent_constraint),
-            'bias_constraint':
-                keras.constraints.serialize(self.bias_constraint),
-            'dropout':
-                self.dropout,
-            'recurrent_dropout':
-                self.recurrent_dropout,
-        }
-        if self.cell._enable_caching_device != tf.executing_eagerly():
-            config.update({'enable_caching_device': self.cell._enable_caching_device})
-        base_config = super(NBR, self).get_config()
-        del base_config['cell']
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @classmethod
-    def from_config(cls, config):
-        if 'implementation' in config and config['implementation'] == 0:
-            config['implementation'] = 1
-        return cls(**config)
+        self.cell = NBRCell(
+                units,
+                activation=activation,
+                recurrent_activation=recurrent_activation,
+                use_bias=use_bias,
+                kernel_initializer=kernel_initializer,
+                recurrent_initializer=recurrent_initializer,
+                bias_initializer=bias_initializer,
+                kernel_regularizer=kernel_regularizer,
+                recurrent_regularizer=recurrent_regularizer,
+                bias_regularizer=bias_regularizer,
+                kernel_constraint=kernel_constraint,
+                recurrent_constraint=recurrent_constraint,
+                bias_constraint=bias_constraint,
+                dropout=dropout,
+                recurrent_dropout=recurrent_dropout,
+                implementation=implementation,
+                **kwargs
+            )
