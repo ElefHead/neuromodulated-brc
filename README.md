@@ -1,6 +1,6 @@
 # Neuromodulated Bistable Recurrent Cell
 
-Tensorflow and Keras based implementation of a recurrent cell as well as the corresponding keras RNN layer 
+Tensorflow and Keras based implementation of a recurrent cell from RNN layer 
 from [**A bio-inspired bistable recurrent cell allows for long-lasting memory**](https://arxiv.org/abs/2006.05252) 
 by [Nicolas Vecoven](https://twitter.com/vecovennicolas), 
 [Damien Ernst](https://twitter.com/DamienERNST1) and [Guillaume Drion](https://sites.google.com/site/gdrion25/). 
