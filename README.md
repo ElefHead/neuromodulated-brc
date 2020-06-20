@@ -42,4 +42,5 @@ evaluation using MNIST data is in the `notebooks` folder.
 * The Bistable Recurrent Cell modifies the GRU. My code also inherits keras GRUCell and GRU and overloads 
 the functions to reflect the equation changes.
 * The implementation is based on my understanding of the equations and modifications. The [authors' implementation can be found here](https://github.com/nvecoven/BRC).
+* The option to add dropout and recurrent dropout remain (assuming they work same as on GRU layers) but are untested.
 
