@@ -1,3 +1,5 @@
+## Follows https://github.com/tensorflow/tensorflow/blob/v2.2.0/tensorflow/python/keras/layers/recurrent_v2.py#L68-L183
+
 import tensorflow as tf
 from tensorflow import keras 
 
